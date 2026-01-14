@@ -58,7 +58,11 @@ export function VADDisplay({
       ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
       ctx.font = "500 14px system-ui, -apple-system, sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText("Record audio to see voice activity detection", width / 2, height / 2);
+      ctx.fillText(
+        "Record audio to see voice activity detection",
+        width / 2,
+        height / 2
+      );
       return;
     }
 
@@ -76,12 +80,16 @@ export function VADDisplay({
     ctx.font = "600 10px system-ui, -apple-system, sans-serif";
     ctx.textAlign = "left";
     ctx.fillText("VOICE ACTIVITY DETECTION", labelWidth + 5, 14);
-    
+
     if (segments && segments.length > 0) {
       ctx.fillStyle = "rgba(34, 197, 94, 0.8)";
       ctx.font = "500 9px system-ui";
       ctx.textAlign = "right";
-      ctx.fillText(`${segments.length} segment${segments.length > 1 ? 's' : ''} detected`, width - 10, 14);
+      ctx.fillText(
+        `${segments.length} segment${segments.length > 1 ? "s" : ""} detected`,
+        width - 10,
+        14
+      );
     }
 
     // Label area background
@@ -92,12 +100,22 @@ export function VADDisplay({
     for (let i = 0; i < numFrames; i++) {
       if (isVoice[i]) {
         const x = labelWidth + i * frameWidth;
-        const gradient = ctx.createLinearGradient(0, topMargin, 0, height - bottomMargin);
+        const gradient = ctx.createLinearGradient(
+          0,
+          topMargin,
+          0,
+          height - bottomMargin
+        );
         gradient.addColorStop(0, "rgba(34, 197, 94, 0.12)");
         gradient.addColorStop(0.5, "rgba(34, 197, 94, 0.08)");
         gradient.addColorStop(1, "rgba(34, 197, 94, 0.12)");
         ctx.fillStyle = gradient;
-        ctx.fillRect(x, topMargin, frameWidth + 0.5, height - topMargin - bottomMargin);
+        ctx.fillRect(
+          x,
+          topMargin,
+          frameWidth + 0.5,
+          height - topMargin - bottomMargin
+        );
       }
     }
 
@@ -107,30 +125,35 @@ export function VADDisplay({
         const startX = labelWidth + (segment.start / duration) * plotWidth;
         const endX = labelWidth + (segment.end / duration) * plotWidth;
         const segWidth = endX - startX;
-        
+
         const isHovered = hoveredSegment === idx;
-        
+
         // Segment background
-        ctx.fillStyle = isHovered 
-          ? "rgba(34, 197, 94, 0.25)" 
+        ctx.fillStyle = isHovered
+          ? "rgba(34, 197, 94, 0.25)"
           : "rgba(34, 197, 94, 0.08)";
-        ctx.fillRect(startX, topMargin, segWidth, height - topMargin - bottomMargin);
-        
+        ctx.fillRect(
+          startX,
+          topMargin,
+          segWidth,
+          height - topMargin - bottomMargin
+        );
+
         // Segment boundaries
         ctx.strokeStyle = isHovered ? "#22c55e" : "rgba(34, 197, 94, 0.6)";
         ctx.lineWidth = isHovered ? 2 : 1;
         ctx.setLineDash(isHovered ? [] : [4, 4]);
-        
+
         ctx.beginPath();
         ctx.moveTo(startX, topMargin);
         ctx.lineTo(startX, height - bottomMargin);
         ctx.stroke();
-        
+
         ctx.beginPath();
         ctx.moveTo(endX, topMargin);
         ctx.lineTo(endX, height - bottomMargin);
         ctx.stroke();
-        
+
         ctx.setLineDash([]);
 
         // Segment label
@@ -139,14 +162,18 @@ export function VADDisplay({
           ctx.fillStyle = isHovered ? "#22c55e" : "rgba(34, 197, 94, 0.7)";
           ctx.font = "500 8px system-ui";
           ctx.textAlign = "center";
-          ctx.fillText(`${segDuration.toFixed(2)}s`, startX + segWidth / 2, height - bottomMargin - 5);
+          ctx.fillText(
+            `${segDuration.toFixed(2)}s`,
+            startX + segWidth / 2,
+            height - bottomMargin - 5
+          );
         }
       });
     }
 
     // Voice activity bar
     const voiceY = topMargin;
-    
+
     ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
     ctx.font = "500 9px system-ui";
     ctx.textAlign = "right";
@@ -161,23 +188,30 @@ export function VADDisplay({
     for (let i = 0; i < numFrames; i++) {
       const x = labelWidth + i * frameWidth;
       const barHeight = voiceHeight - 8;
-      
+
       if (isVoice[i]) {
-        const gradient = ctx.createLinearGradient(0, voiceY + 4, 0, voiceY + 4 + barHeight);
+        const gradient = ctx.createLinearGradient(
+          0,
+          voiceY + 4,
+          0,
+          voiceY + 4 + barHeight
+        );
         gradient.addColorStop(0, "#4ade80");
         gradient.addColorStop(1, "#22c55e");
         ctx.fillStyle = gradient;
       } else {
         ctx.fillStyle = "rgba(55, 65, 81, 0.5)";
       }
-      
+
       ctx.fillRect(x, voiceY + 4, Math.max(1, frameWidth - 0.5), barHeight);
     }
 
     // Energy plot
     const energyY = voiceY + voiceHeight + 8;
     const maxEnergy = Math.max(...energy);
-    const normalizedEnergy = energy.map((e) => maxEnergy > 0 ? e / maxEnergy : 0);
+    const normalizedEnergy = energy.map((e) =>
+      maxEnergy > 0 ? e / maxEnergy : 0
+    );
 
     ctx.fillStyle = "rgba(59, 130, 246, 0.4)";
     ctx.font = "500 9px system-ui";
@@ -189,13 +223,19 @@ export function VADDisplay({
     ctx.moveTo(labelWidth, energyY + energyHeight);
     for (let i = 0; i < numFrames; i++) {
       const x = labelWidth + i * frameWidth + frameWidth / 2;
-      const y = energyY + energyHeight - normalizedEnergy[i] * (energyHeight - 5);
+      const y =
+        energyY + energyHeight - normalizedEnergy[i] * (energyHeight - 5);
       ctx.lineTo(x, y);
     }
     ctx.lineTo(labelWidth + plotWidth, energyY + energyHeight);
     ctx.closePath();
-    
-    const energyGradient = ctx.createLinearGradient(0, energyY, 0, energyY + energyHeight);
+
+    const energyGradient = ctx.createLinearGradient(
+      0,
+      energyY,
+      0,
+      energyY + energyHeight
+    );
     energyGradient.addColorStop(0, "rgba(59, 130, 246, 0.3)");
     energyGradient.addColorStop(1, "rgba(59, 130, 246, 0.02)");
     ctx.fillStyle = energyGradient;
@@ -210,7 +250,8 @@ export function VADDisplay({
 
     for (let i = 0; i < numFrames; i++) {
       const x = labelWidth + i * frameWidth + frameWidth / 2;
-      const y = energyY + energyHeight - normalizedEnergy[i] * (energyHeight - 5);
+      const y =
+        energyY + energyHeight - normalizedEnergy[i] * (energyHeight - 5);
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     }
@@ -219,7 +260,7 @@ export function VADDisplay({
     // ZCR plot
     const zcrY = energyY + energyHeight + 8;
     const maxZCR = Math.max(...zcr);
-    const normalizedZCR = zcr.map((z) => maxZCR > 0 ? z / maxZCR : 0);
+    const normalizedZCR = zcr.map((z) => (maxZCR > 0 ? z / maxZCR : 0));
 
     ctx.fillStyle = "rgba(245, 158, 11, 0.4)";
     ctx.font = "500 9px system-ui";
@@ -236,7 +277,7 @@ export function VADDisplay({
     }
     ctx.lineTo(labelWidth + plotWidth, zcrY + zcrHeight);
     ctx.closePath();
-    
+
     const zcrGradient = ctx.createLinearGradient(0, zcrY, 0, zcrY + zcrHeight);
     zcrGradient.addColorStop(0, "rgba(245, 158, 11, 0.25)");
     zcrGradient.addColorStop(1, "rgba(245, 158, 11, 0.02)");
@@ -261,7 +302,7 @@ export function VADDisplay({
     ctx.font = "500 9px system-ui";
     ctx.textAlign = "center";
     if (duration > 0) {
-      [0, 0.25, 0.5, 0.75, 1].forEach(t => {
+      [0, 0.25, 0.5, 0.75, 1].forEach((t) => {
         const x = labelWidth + t * plotWidth;
         ctx.fillText((t * duration).toFixed(1) + "s", x, height - 8);
       });
@@ -270,13 +311,25 @@ export function VADDisplay({
     // Draw playhead
     if (duration > 0 && currentTime >= 0) {
       const playheadX = labelWidth + (currentTime / duration) * plotWidth;
-      
+
       // Glow
-      const glowGradient = ctx.createRadialGradient(playheadX, height / 2, 0, playheadX, height / 2, 20);
+      const glowGradient = ctx.createRadialGradient(
+        playheadX,
+        height / 2,
+        0,
+        playheadX,
+        height / 2,
+        20
+      );
       glowGradient.addColorStop(0, "rgba(239, 68, 68, 0.25)");
       glowGradient.addColorStop(1, "rgba(239, 68, 68, 0)");
       ctx.fillStyle = glowGradient;
-      ctx.fillRect(playheadX - 20, topMargin, 40, height - topMargin - bottomMargin);
+      ctx.fillRect(
+        playheadX - 20,
+        topMargin,
+        40,
+        height - topMargin - bottomMargin
+      );
 
       ctx.strokeStyle = "#ef4444";
       ctx.lineWidth = 2;
@@ -320,7 +373,7 @@ export function VADDisplay({
 
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!segments || duration === 0) return;
-    
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -353,19 +406,6 @@ export function VADDisplay({
         height: "100%",
         cursor: onSeek || onSegmentClick ? "pointer" : "default",
         borderRadius: "8px",
-      }}
-    />
-  );
-}
-
-  return (
-    <canvas
-      ref={canvasRef}
-      onClick={handleClick}
-      style={{
-        width: "100%",
-        height: "100%",
-        cursor: onSeek || onSegmentClick ? "pointer" : "default",
       }}
     />
   );
